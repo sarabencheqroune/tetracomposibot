@@ -35,10 +35,10 @@ def step(robotId, sensors):
         for i in range(8):
             dist = sensors[i][0]
             weight = GENETIC_WEIGHTS[0][i]
-            rotation += weight * (1.0 - dist)  # Plus proche = plus d'effet
+            rotation += weight * (1.0 - dist)  
         return translation, rotation
 
-    # Niveau 2 : Robot explorateur (ex: robot 1) -> Comportement Braitenberg attraction vers zones libres
+    # Niveau 2 : Robot explorateur -> Comportement Braitenberg attraction vers zones libres
     if robotId == 1:
         translation = FORWARD_SPEED
         rotation = (right - left)
@@ -46,7 +46,7 @@ def step(robotId, sensors):
             rotation += random.choice([-TURN_SPEED, TURN_SPEED])
         return translation, rotation
 
-    # Niveau 1 : Robot patrouilleur (ex: robot 2) -> Alterne exploration/fuite
+    # Niveau 1 : Robot patrouilleur -> Alterne exploration/fuite
     if robotId == 2:
         if not hasattr(step, "memory"):
             step.memory = [0] * 4
@@ -63,7 +63,7 @@ def step(robotId, sensors):
         step.memory[robotId] = (state + 1) % 100
         return translation, rotation
 
-    # Niveau 0 : Robot par défaut (ex: robot 3) -> Évitement simple
+    # Niveau 0 : Robot par défaut -> Évitement simple
     if front < 0.5:
         translation = 0.0
         rotation = TURN_SPEED if left > right else -TURN_SPEED
@@ -71,3 +71,22 @@ def step(robotId, sensors):
         translation = FORWARD_SPEED
         rotation = (right - left)
     return translation, rotation
+
+class Robot_player:
+    def __init__(self, x, y, angle, name, team):
+        self.x = x
+        self.y = y
+        self.angle = angle         # optionnel
+        self.theta = angle         # orientation actuelle requise
+        self.x0 = x
+        self.y0 = y
+        self.theta0 = angle
+        self.name = name
+        self.team = team
+        self.robot_id = 0
+        self.id = 0
+        self.memory = 0
+
+    def step(self, sensors):
+        translation, rotation = step(self.robot_id, sensors)
+        return translation, rotation, self.memory
